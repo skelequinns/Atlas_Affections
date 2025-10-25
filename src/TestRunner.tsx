@@ -1,102 +1,130 @@
-import {Stage} from "./Stage";
-import {useEffect, useState} from "react";
-import {DEFAULT_INITIAL, StageBase, InitialData} from "@chub-ai/stages-ts";
+import React, { useEffect, useState } from 'react';
+import { Stage } from './Stage';
+import { Message } from '@chub-ai/stages-ts';
 
-// Modify this JSON to include whatever character/user information you want to test.
-import InitData from './assets/test-init.json';
+// Test data
+const testInit = {
+    users: {
+        '0': {
+            anonymizedId: '1',
+            name: 'User',
+            isRemoved: false,
+            chatProfile: ''
+        }
+    },
+    characters: {
+        '1': {
+            anonymizedId: '1',
+            name: 'Atlas Xalvador',
+            isRemoved: false,
+            description: 'The Iron Sentinel',
+            example_dialogs: '',
+            personality: 'Reserved, blunt, loyal',
+            first_message: 'What do you want?',
+            scenario: 'Military planning room in Noctaris',
+            tavern_personality: '',
+            system_prompt: '',
+            post_history_instructions: '',
+            alternate_greetings: [],
+            partial_extensions: {
+                chub: {
+                    background_image: null
+                }
+            }
+        }
+    },
+    messageState: null,
+    config: null,
+    environment: 'development' as const,
+    initState: null,
+    chatState: null
+};
 
-export interface TestStageRunnerProps<StageType extends StageBase<InitStateType, ChatStateType, MessageStateType, ConfigType>, InitStateType, ChatStateType, MessageStateType, ConfigType> {
-    factory: (data: InitialData<InitStateType, ChatStateType, MessageStateType, ConfigType>) => StageType;
+interface TestStageRunnerProps {
+    factory: (data: any) => Stage;
 }
 
-/***
- This is a testing class for running a stage locally when testing,
-    outside the context of an active chat. See runTests() below for the main idea.
- ***/
-export const TestStageRunner = <StageType extends StageBase<InitStateType, ChatStateType, MessageStateType, ConfigType>,
-    InitStateType, ChatStateType, MessageStateType, ConfigType>({ factory }: TestStageRunnerProps<StageType, InitStateType, ChatStateType, MessageStateType, ConfigType>) => {
-
-    // You may need to add a @ts-ignore here,
-    //     as the linter doesn't always like the idea of reading types arbitrarily from files
-    // @ts-ignore
-    const [stage, _setStage] = useState(new Stage({...DEFAULT_INITIAL, ...InitData}));
-
-    // This is what forces the stage node to re-render.
-    const [node, setNode] = useState(new Date());
-
-    function refresh() {
-        setNode(new Date());
-    }
-
-    async function delayedTest(test: any, delaySeconds: number) {
-        await new Promise(f => setTimeout(f, delaySeconds * 1000));
-        return test();
-    }
-
-    /***
-     This is the main thing you'll want to modify.
-     ***/
-    async function runTests() {
-        /*
-        await stage.setState({someKey: 'A new value, even!'});
-        refresh();
-
-        const beforePromptResponse: Partial<StageResponse<ChatStateType, MessageStateType>> = await stage.beforePrompt({
-            ...DEFAULT_MESSAGE, ...{
-                anonymizedId: "0",
-                content: "Hello, this is what happens when a human sends a message, but before it's sent to the model.",
-                isBot: false
-            }
-        });
-        console.assert(beforePromptResponse.error == null);
-        refresh();
-        */
-        /***
-         "What is all of this nonsense with 'DEFAULT_MESSAGE'?" you may well ask.
-         The purpose of this is to future-proof your test runner.
-         The stage interface is designed to be forwards-compatible,
-            so that a stage with a certain library version will continue to work
-            even if new fields are added to any of the call/response objects.
-         But when new fields are added to the input objects, the code calling an
-            stage needs to be updated. Using DEFAULT_MESSAGE,
-            DEFAULT_INITIAL, DEFAULT_CHARACTER, DEFAULT_USER,
-            DEFAULT_LOAD_RESPONSE, and DEFAULT_RESPONSE
-            where relevant in your tests prevents a version bump
-            from breaking your test runner in many cases.
-         ***/
-        /*
-        const afterPromptResponse: Partial<StageResponse<ChatStateType, MessageStateType>> = await stage.afterResponse({
-            ...DEFAULT_MESSAGE, ...{
-            promptForId: null,
-            anonymizedId: "2",
-            content: "Why yes hello, and this is what happens when a bot sends a response.",
-            isBot: true}});
-        console.assert(afterPromptResponse.error == null);
-        refresh();
-
-        const afterDelayedThing: Partial<StageResponse<ChatStateType, MessageStateType>> = await delayedTest(() => stage.beforePrompt({
-            ...DEFAULT_MESSAGE, ...{
-            anonymizedId: "0", content: "Hello, and now the human is prompting again.", isBot: false, promptForId: null
-        }}), 5);
-        console.assert(afterDelayedThing.error == null);
-        refresh();
-        */
-    }
+export function TestStageRunner({ factory }: TestStageRunnerProps) {
+    const [testOutput, setTestOutput] = useState<string[]>([]);
+    const [stage, setStage] = useState<Stage | null>(null);
 
     useEffect(() => {
-        // Always do this first, and put any other calls inside the load response.
-        stage.load().then((res) => {
-            console.info(`Test StageBase Runner load success result was ${res.success}`);
-            if(!res.success || res.error != null) {
-                console.error(`Error from stage during load, error: ${res.error}`);
-            } else {
-                runTests().then(() => console.info("Done running tests."));
-            }
-        });
+        runTests();
     }, []);
 
-    return <>
-        <div style={{display: 'none'}}>{String(node)}{window.location.href}</div>
-        {stage == null ? <div>Stage loading...</div> : stage.render()}
-    </>;
+    async function runTests() {
+        const output: string[] = [];
+
+        output.push('=== Atlas Xalvador Affection System Test ===\n');
+
+        const stageInstance = factory(testInit);
+        await stageInstance.load();
+        setStage(stageInstance);
+
+        // Test scenarios
+        const testMessages: Array<{ content: string; description: string; isBot: boolean }> = [
+            { content: "General, what's your tactical assessment of our position?", description: 'Neutral - Military respect', isBot: false },
+            { content: "I respect your leadership", description: 'Should increase affection', isBot: false },
+            { content: "Tell me about your childhood", description: 'Too personal for Neutral - should decrease', isBot: false },
+            { content: "Let's discuss battle strategy", description: 'Appropriate for current level', isBot: false },
+            { content: "I trust you completely", description: 'Building trust', isBot: false },
+            { content: "Want to spar together?", description: 'Friendly invitation', isBot: false },
+            { content: "You're incredibly skilled", description: 'Compliment/respect', isBot: false },
+            { content: "I care about you", description: 'Emotional connection', isBot: false },
+            { content: "You're beautiful", description: 'Romantic interest', isBot: false },
+            { content: "I love you", description: 'Declaration of love', isBot: false },
+        ];
+
+        for (const testMsg of testMessages) {
+            const message: Message = {
+                content: testMsg.content,
+                anonymizedId: '1',
+                isBot: testMsg.isBot,
+                promptForId: '1',
+                identity: '1',
+                isMain: true
+            };
+
+            const result = await stageInstance.beforePrompt(message);
+
+            output.push(`\n📝 User: "${testMsg.content}"`);
+            output.push(`   Description: ${testMsg.description}`);
+            output.push(`   Affection: ${result.messageState?.affection}/100`);
+            output.push(`   Sentiment: ${result.messageState?.sentiment}`);
+            output.push(`   ---`);
+        }
+
+        output.push('\n=== Test Complete ===\n');
+
+        setTestOutput(output);
+    }
+
+    return (
+        <div style={{ padding: '20px', fontFamily: 'monospace', backgroundColor: '#1a1a1a', color: '#fff', minHeight: '100vh' }}>
+            <h1>Atlas Xalvador Affection System - Test Runner</h1>
+
+            {stage && (
+                <div style={{ marginBottom: '20px' }}>
+                    {stage.render()}
+                </div>
+            )}
+
+            <div style={{ marginTop: '20px' }}>
+                <h2>Test Output:</h2>
+                <pre style={{ backgroundColor: '#0a0a0a', padding: '15px', borderRadius: '5px', overflow: 'auto' }}>
+                    {testOutput.join('\n')}
+                </pre>
+            </div>
+
+            <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#2a2a2a', borderRadius: '5px' }}>
+                <h3>How to Use:</h3>
+                <ul>
+                    <li>This test runner automatically runs on load</li>
+                    <li>Watch the affection changes as messages are processed</li>
+                    <li>The UI component above shows the current state</li>
+                    <li>Check the console for additional details</li>
+                </ul>
+            </div>
+        </div>
+    );
 }
