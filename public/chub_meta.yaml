@@ -74,10 +74,3 @@ state_schema:
 # extension_id is automatically generated on push with a new project;
 #    you should not make or set this value.
 # github_path will be added if it does not exist. It is the URL of the repo.
-
-
-github_path: 'https://github.com/skelequinns/Atlas_Affections'
-
-
-extension_id: 'atlas-affections-8612ff369e07'
-

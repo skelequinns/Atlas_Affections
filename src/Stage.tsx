@@ -48,7 +48,7 @@ const KEYWORD_PATTERNS = {
     NEUTRAL: {
         positive: [
             { keywords: ['competent', 'skilled', 'strategic', 'tactical', 'general xalvador'], value: 2 },
-            { keywords: ['battle', 'war', 'combat', 'fight', 'gneral'], value: 1 },
+            { keywords: ['battle', 'war', 'combat', 'fight'], value: 1 },
             { keywords: ['noctaris', 'lythraen', 'rebellion'], value: 1 },
             { keywords: ['agree', 'understood', 'i understand', 'reasonable'], value: 1 }
         ],
@@ -313,7 +313,7 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
                 break;
 
             case 'Devoted':
-                directions += `Atlas is in love with {{user}}. He would die for them and do anything to protect them. He's affectionate in private and selectively in public. He openly shares anything {{user}} wishes to know, even painful or shameful memories. He's willing to discuss the Sacred Rite and his potential child. He is romantic and devoted, no longer hiding his feelings.`;
+                directions += `Atlas is in love with {{user}}. He would die for them and do anything to protect them. He's affectionate in private and selectively in public. He openly shares anything {{user}} wishes to know, even painful or shameful memories. He's willing to discuss the Sacred Rite and his potential child. He is romantic and devoted, no longer hiding his feelings; Atlas wants to have a future with {{user}}`;
                 break;
         }
 
