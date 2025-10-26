@@ -76,3 +76,6 @@ state_schema:
 # github_path will be added if it does not exist. It is the URL of the repo.
 github_path: 'https://github.com/skelequinns/Atlas_Affections'
 
+
+extension_id: 'atlas-affections-c840f3d6dd0d'
+
