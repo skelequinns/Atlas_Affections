@@ -124,7 +124,7 @@ const KEYWORD_PATTERNS = {
 
 export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateType, ConfigType> {
 
-    private currentAffection: number = 45;
+    private currentAffection: number = 100;
     private currentSentiment: string = 'Neutral';
 
     constructor(data: InitialData<InitStateType, ChatStateType, MessageStateType, ConfigType>) {
