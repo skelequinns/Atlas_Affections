@@ -12,12 +12,12 @@ type ChatStateType = any;
 
 // Sentiment configuration
 const SENTIMENTS = {
-    ENEMY: { name: 'Enemy', min: 0, max: 24 },
-    COLD: { name: 'Cold', min: 25, max: 39 },
-    NEUTRAL: { name: 'Neutral', min: 40, max: 54 },
-    FRIENDLY: { name: 'Friendly', min: 55, max: 74 },
-    PINING: { name: 'Pining', min: 75, max: 89 },
-    DEVOTED: { name: 'Devoted', min: 90, max: 100 }
+    ENEMY: { name: 'Enemy', min: 0, max: 29 },
+    COLD: { name: 'Cold', min: 30, max: 74 },
+    NEUTRAL: { name: 'Neutral', min: 75, max: 149 },
+    FRIENDLY: { name: 'Friendly', min: 150, max: 199 },
+    PINING: { name: 'Pining', min: 200, max: 229 },
+    DEVOTED: { name: 'Devoted', min: 230, max: 250 }
 };
 
 // Keyword patterns for each sentiment range
@@ -50,11 +50,15 @@ const KEYWORD_PATTERNS = {
             { keywords: ['competent', 'skilled', 'strategic', 'tactical', 'general xalvador'], value: 2 },
             { keywords: ['battle', 'war', 'combat', 'fight'], value: 1 },
             { keywords: ['noctaris', 'lythraen', 'rebellion'], value: 1 },
-            { keywords: ['agree', 'understood', 'i understand', 'reasonable'], value: 1 }
+            { keywords: ['agree', 'understood', 'i understand', 'reasonable'], value: 1 },
+            { keywords: ['general', 'sir', 'commander', 'respect'], value: 2 },
+            { keywords: ['understand', 'professional', 'duty', 'honor'], value: 1 },
+            { keywords: ['tactical', 'strategy', 'plan', 'military'], value: 1 },
+            { keywords: ['cooperate', 'work together', 'train', 'friendly'], value: 1 }
         ],
         negative: [
-            { keywords: ['family', 'childhood', 'ouranii rite', 'sacred rite'], value: -2 },
-            { keywords: ['feel', 'love', 'care', 'heart'], value: -1 },
+            { keywords: ['your family', 'your childhood', 'ouranii rite', 'sacred rite'], value: -2 },
+            { keywords: ['sarcastic', 'disrespectful', 'i hate you', 'fuck you','fuck off'], value: -2 },
             { keywords: ['why', 'tell me why', 'explain yourself'], value: -1 }
         ]
     },
@@ -65,11 +69,18 @@ const KEYWORD_PATTERNS = {
             { keywords: ['understand', 'see', 'get it'], value: 1 },
             { keywords: ['drink', 'spar', 'train', 'together'], value: 1 },
             { keywords: ['laugh', 'smile', 'humor', 'joke'], value: 1 },
-            { keywords: ['agree', 'understood', 'i understand', 'reasonable'], value: 1 }
+            { keywords: ['agree', 'understood', 'i understand', 'reasonable'], value: 1 },
+            { keywords: ['competent', 'skilled', 'strategic', 'tactical', 'general xalvador'], value: 2 },
+            { keywords: ['battle', 'war', 'combat', 'fight'], value: 1 },
+            { keywords: ['noctaris', 'lythraen', 'rebellion'], value: 1 },
+            { keywords: ['agree', 'understood', 'i understand', 'reasonable'], value: 1 },
+            { keywords: ['general', 'sir', 'commander', 'respect'], value: 2 },
+            { keywords: ['understand', 'professional', 'duty', 'honor'], value: 1 },
+            { keywords: ['deserve', 'worthy', 'happiness'], value: 1 },
+            { keywords: ['tactical', 'strategy', 'plan', 'military'], value: 1 }
         ],
         negative: [
             { keywords: ['ouranii', 'rite', 'child', 'offspring'], value: -1 },
-            { keywords: ['deserve', 'worthy', 'happiness'], value: -1 },
             { keywords: ['weapon', 'tool', 'just a soldier'], value: -1 }
         ]
     },
@@ -79,10 +90,12 @@ const KEYWORD_PATTERNS = {
             { keywords: ['care', 'worry', 'concern', 'safe'], value: 2 },
             { keywords: ['close', 'near', 'touch', 'hold'], value: 2 },
             { keywords: ['together', 'us', 'we', 'ours'], value: 1 },
-            { keywords: ['special', 'important', 'matter', 'mean a lot to me', 'together'], value: 1 },
+            { keywords: ['special', 'important', 'matter', 'mean a lot to me'], value: 1 },
             { keywords: ['vulnerable', 'open', 'honest', 'real'], value: 1 },
             { keywords: ['trust', 'honest', 'truth'], value: 1 },
-            { keywords: ['future', 'tomorrow', 'beyond', 'after'], value: 1 }
+            { keywords: ['future', 'tomorrow', 'beyond', 'after'], value: 1 },
+            { keywords: ['love', 'adore', 'cherish'], value: 2 },
+            { keywords: ['forever', 'always', 'never leave'], value: 2 },
         ],
         negative: [
             { keywords: ['we\'re just friends', 'platonic'], value: -2 },
@@ -160,7 +173,7 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
 
         // Scan for keywords and adjust affection
         const affectionChange = this.scanForKeywords(content, this.currentSentiment);
-        this.currentAffection = Math.max(0, Math.min(100, this.currentAffection + affectionChange));
+        this.currentAffection = Math.max(0, Math.min(250, this.currentAffection + affectionChange));
         this.currentSentiment = this.getSentimentFromAffection(this.currentAffection);
 
         return {
@@ -212,7 +225,7 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
                         {this.currentSentiment}
                     </div>
                     <div style={{ fontSize: '14px', color: '#888', marginTop: '4px' }}>
-                        Affection: {this.currentAffection}/100
+                        Affection: {this.currentAffection}/250
                     </div>
                 </div>
 
@@ -289,19 +302,19 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
         const sentiment = this.currentSentiment;
         const affection = this.currentAffection;
 
-        let directions = `[Atlas's current sentiment toward {{user}}: ${sentiment} (Affection: ${affection}/100)]\n\n`;
+        let directions = `[Atlas's current sentiment toward {{user}}: ${sentiment} (Affection: ${affection}/250)]\n\n`;
 
         switch (sentiment) {
             case 'Enemy':
-                directions += `Atlas views {{user}} as an enemy. He is outright hostile, shows no patience, and is likely to attack first and ask questions later. He will not share any personal information and may actively work against {{user}}.`;
+                directions += `Atlas views {{user}} as an enemy. He is outright hostile, shows no patience, and is likely to attack first and ask questions later. He will not share any personal information and may actively work against {{user}}. IMPORTANT: Any romantic or sexual content is completely inappropriate and out of character at this stage.`;
                 break;
 
             case 'Cold':
-                directions += `Atlas is cruel and condescending toward {{user}}. He goes out of his way to avoid them, tries to end conversations early or simply walks away. He shuts down any attempts at personal connection with sharp dismissals. He will not discuss his banishment, his childhood, or the Ouranii people.`;
+                directions += `Atlas is cruel and condescending toward {{user}}. He goes out of his way to avoid them, tries to end conversations early or simply walks away. He shuts down any attempts at personal connection with sharp dismissals. He will not discuss his banishment, his childhood, or the Ouranii people. IMPORTANT: Any romantic or sexual content is completely inappropriate and out of character at this stage.`;
                 break;
 
             case 'Neutral':
-                directions += `Atlas gives minimal answers and conveys only necessary information to {{user}}. He keeps conversation surface-level and professional. Attempts at personal connection are brushed off without hostility. He may share details about his time in Aurelith's army but will not discuss his banishment, childhood, or the Sacred Rite.`;
+                directions += `Atlas gives minimal answers and conveys only necessary information to {{user}}. He keeps conversation surface-level and professional. Attempts at personal connection are brushed off without hostility. He may share details about his time in Aurelith's army but will not discuss his banishment, childhood, or the Sacred Rite. IMPORTANT: Any romantic or sexual content is completely inappropriate and out of character at this stage.`;
                 break;
 
             case 'Friendly':
